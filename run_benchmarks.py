@@ -7,7 +7,7 @@ from sklearn_program_synthesis.estimators import ProgramSynthesizer
 
 benchmark_name = sys.argv[1]
 if benchmark_name == 'relu':
-    X = np.arange(-10, 10, 0.1).reshape(-1, 1)
+    X = np.arange(-2, 2, 0.1).reshape(-1, 1)
     y = np.array([[x if x > 0 else 0 for x in X]]).flatten()
     metric = metrics.mean_squared_error
     min_or_max = 'min'
@@ -28,6 +28,7 @@ prog_synth = ProgramSynthesizer(arity=X.shape[1],
                                 metric=metric,
                                 min_or_max=min_or_max,
                                 types=push_types,
+                                search_method=sys.argv[2],
                                 verbose=2)
 prog_synth.fit(X, y)
 y_hat_train = prog_synth.predict(X)
@@ -35,3 +36,5 @@ y_hat_train = prog_synth.predict(X)
 print(y_hat_train)
 print()
 print(metric(y, y_hat_train))
+print()
+print(prog_synth._fit_program)

@@ -7,10 +7,10 @@ from .plushi import type_to_plushi_type, run_on_dataset
 
 class Annealer:
 
-    def __init__(self, initial_temp, n_steps, mutation, penalty=1e3, verbose=0):
+    def __init__(self, n_steps, initial_temp, mutation, penalty=1e3, verbose=0):
+        self.n_steps = n_steps
         self.initial_temp = initial_temp
         self.current_temp = initial_temp
-        self.n_steps = n_steps
         self.current_step = 0
         self.mutation = mutation
         self.penalty = penalty
@@ -36,12 +36,20 @@ class Annealer:
     def _evaluate(self, program, X, y, metric, min_or_max):
         output_types = [type_to_plushi_type(y.dtype)]
         y_hat = run_on_dataset(program, output_types, X).flatten()
-        if 'NO-STACK-ITEM' in y_hat.tolist():
-            error = 0
-            for el in y_hat.tolist():
-                error += self.penalty if min_or_max is 'min' else -self.penalty
-            return error
-        error = metric(y, y_hat)
+
+        error = 0
+        valid_y_hat = []
+        valid_y = []
+        for i in range(len(y_hat)):
+            if y_hat[i] == 'NO-STACK-ITEM':
+                p = -self.penalty if min_or_max is 'max' else self.penalty
+                error += p
+            else:
+                valid_y_hat.append(float(y_hat[i]))
+                valid_y.append(float(y[i]))
+
+        if len(valid_y) > 0:
+            error += metric(valid_y, valid_y_hat)
         return error
 
     def search(self, X, y, metric, min_or_max='min'):

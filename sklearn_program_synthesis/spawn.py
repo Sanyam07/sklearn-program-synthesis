@@ -18,7 +18,7 @@ class RandomPushSpawner:
                  max_integer=int(1e5),
                  min_float=-1.0,
                  max_float=1.0,
-                 max_string_length=50,
+                 max_string_length=30,
                  valid_string_chars=ascii_letters + digits):
         self.instruction_set = instruction_set
         self.min_length = min_length

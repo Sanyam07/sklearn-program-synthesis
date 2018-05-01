@@ -5,6 +5,7 @@ from .plushi import (
 from .spawn import RandomPushSpawner
 from .mutation import UMADMutation
 from .annealing import Annealer
+from .evolution import Evolver
 
 from sklearn.base import BaseEstimator
 
@@ -21,9 +22,10 @@ class ProgramSynthesizer(BaseEstimator):
 
         if search_method == 'annealing':
             self.mutation = UMADMutation(RandomPushSpawner(instruction_set))
-            self.searcher = Annealer(1, 2000, self.mutation, verbose=self.verbose)
+            self.searcher = Annealer(2000, 1, self.mutation, verbose=self.verbose)
         elif search_method == 'evolution':
-            ...
+            self.mutation = UMADMutation(RandomPushSpawner(instruction_set))
+            self.searcher = Evolver(100, 100, self.mutation, verbose=self.verbose)
         else:
             self.searcher = search_method
 
